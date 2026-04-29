@@ -10,6 +10,12 @@
 
 ## 설치 방법
 
+### 0. Release 다운로드
+
+releases 페이지에서 최신 zip 파일 다운로드
+
+[releases 페이지로 이동](https://github.com/insung52/ShadowCatcher_Unreal/releases)
+
 ### 1. Plugins 폴더에 복사
 
 ShadowCatcherPlugin.ZIP 파일 압축 해제 후 프로젝트 루트 폴더의 `Plugins/` 안에 넣습니다.
