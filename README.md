@@ -1,5 +1,9 @@
 # ShadowCatcherLS
 
+![alt text](image-2.png)
+
+![alt text](image-3.png)
+
 임의 형태의 메시 위에, **여러 디렉셔널 라이트**의 그림자를 받아 투명하게 합성하는 셰도우 캐처 플러그인 (UE 5.7).
 빛 공간 깊이(light-space depth) 방식이라 catcher 메시의 모양·스케일·회전이 자유롭고, catcher를 여러 개 써도 됩니다.
 
@@ -13,7 +17,7 @@
 3. 에디터에서 플러그인 활성화 확인.
 
 ### 씬 구성 (4단계)
-1. **Manager 배치** — `ShadowDepthManager` 액터를 레벨에 **1개** 배치하고 Details에서 지정:
+1. **Manager 배치** — `ShadowDepthManager` 액터를 레벨에 **1개**(directional light 개수에 관계 없이) 배치하고 Details에서 지정:
    - `Depth Atlas RT` = `RT_LightDepthAtlas`
    - `Light Params RT` = `RT_LightParams`
    - `Shadow MPC` = `MPC_ShadowLight`
@@ -25,7 +29,7 @@
 ### 동작
 - 커버 범위는 `ShadowCaster` 태그가 붙은 액터들의 **합산 바운드에 자동으로 맞춰집니다**(고정 크기 한계 없음).
 - 여러 빛의 그림자는 기본적으로 **평균**으로 합쳐집니다(빛이 많을수록 한 그림자는 옅어짐 — 물리적으로 자연스러움).
-- **빛을 향한 면**에만 그림자가 그려집니다(빛을 등진 면은 자체 음영이라 제외).
+- **빛을 향한 면**에만 그림자가 그려집니다.
 
 ### Manager 조정 값
 | 값 | 의미 |
