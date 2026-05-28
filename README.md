@@ -22,11 +22,17 @@
    - `Light Params RT` = `RT_LightParams`
    - `Shadow MPC` = `MPC_ShadowLight`
    (셋 다 플러그인 콘텐츠에 포함되어 있음)
+
+![alt text](image-7.png)
+
 ![alt text](image-5.png)
+
 2. **Caster 태그** — 그림자를 *던질* 액터의 **Actor Tag**에 `ShadowCaster` 추가.
 ![alt text](image-4.png)
+
 3. **Catcher 머티리얼** — 그림자를 *받을* 아무 메시에 `M_ShadowCatcherLS` 적용. 모양/스케일/회전 자유, 여러 개 가능.
 ![alt text](image-6.png)
+
 4. **디렉셔널 라이트** — 레벨에 1개 이상 두고 **Play**.
 
 ### 동작
