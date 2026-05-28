@@ -22,8 +22,11 @@
    - `Light Params RT` = `RT_LightParams`
    - `Shadow MPC` = `MPC_ShadowLight`
    (셋 다 플러그인 콘텐츠에 포함되어 있음)
+![alt text](image-5.png)
 2. **Caster 태그** — 그림자를 *던질* 액터의 **Actor Tag**에 `ShadowCaster` 추가.
+![alt text](image-4.png)
 3. **Catcher 머티리얼** — 그림자를 *받을* 아무 메시에 `M_ShadowCatcherLS` 적용. 모양/스케일/회전 자유, 여러 개 가능.
+![alt text](image-6.png)
 4. **디렉셔널 라이트** — 레벨에 1개 이상 두고 **Play**.
 
 ### 동작
@@ -34,23 +37,25 @@
 ### Manager 조정 값
 | 값 | 의미 |
 |---|---|
-| `Tile Size` | 빛 1개당 그림자 해상도. 큰 씬에서 올림. 아틀라스 RT 크기는 자동 조정. |
-| `Tiles Per Row` | 빛 개수 용량 = `TilesPerRow²` (아틀라스 격자). 아틀라스 자동 리사이즈. |
+| `Tile Size` | 빛 1개당 그림자 해상도. 큰 씬에서 높은 값을 사용(ex. 2048). Atlas RT 크기는 자동 조정. |
+| `Tiles Per Row` | Atlas 격자 수 조절. 빛 최대 개수 = `TilesPerRow²`. |
 | `Bounds Padding` | caster 바운드 여백(그림자 잘림 방지). |
 | `Depth Bias` | 그림자 줄무늬(acne) ↔ 떠 보임(peter-panning) 균형. |
 | `Shadow Strength` | 그림자 불투명도(평균 모드). |
-| `Round Robin` | 프레임당 빛 1개만 갱신(저비용, 약간의 지연) vs 매 프레임 전체. |
-| `Force Opaque Shadow` | 켜면 가려진 픽셀을 **무조건 불투명 검정**으로(평균·Strength 무시). |
+| `Round Robin` | 프레임당 빛 1개만 갱신(저비용, 약간의 지연) vs 매 프레임 전체. (프레임 당 빛 개수 만큼 캡쳐) |
+| `Force Opaque Shadow` | 가려진 픽셀을 **무조건 불투명 검정**으로(평균·Strength 무시). |
+
+ Atlas 는 (Tile Size) * (Tiles Per Row) 해상도로 자동 리사이즈 됩니다.
 
 ### 용량 / 한계
-- 빛 개수 상한은 `TilesPerRow²` 와 파라미터 RT 높이(기본 256)까지 — 둘 다 설정으로 확장 가능, 셰이더에 박힌 한계는 없음.
-- 빛마다 직교 깊이맵 1장(캐스케이드 없음). caster가 아주 넓게 흩어진 씬은 해상도가 분산되므로 `Tile Size`를 키우거나 구역별 Manager로 대응.
+- 빛 개수 상한은 `TilesPerRow²` 와 파라미터 RT 높이(기본 256)까지 — 둘 다 설정으로 확장 가능, 셰이더에 고정된 한계는 없음.
+- 빛마다 직교 깊이맵 1장(캐스케이드 없음). caster가 아주 넓게 흩어진 씬은 해상도가 분산되므로 `Tile Size`를 키우거나 구역별 Manager로 대응해야함.
 
 ---
 
 ## 2. 어떻게 구현했는가 (개요)
 
-**방식: 빛 공간 깊이(섀도우 매핑).** 위에서 내려다본 투영을 catcher에 다시 입히는 것이 아니라, **빛 방향에서 본 caster 깊이**와 catcher 픽셀의 빛 공간 깊이를 비교해 가려짐을 판정합니다. 그래서 그림자가 빛에 종속되며, 깊이 정보 한 벌로 **모든 catcher**를 처리할 수 있습니다.
+**방식: 빛 공간 깊이(섀도우 매핑).** 위에서 내려다본 투영을 catcher에 다시 입히는 이전 방식 대신, **빛 방향에서 본 caster 깊이**와 catcher 픽셀의 빛 공간 깊이를 비교해 가려짐을 판정합니다. 그래서 그림자가 빛에 종속되며, 깊이 정보 한 벌로 **모든 catcher**를 처리할 수 있습니다.
 
 ### Manager (`AShadowDepthManager`, C++)
 - 매 프레임 각 디렉셔널 라이트마다: 직교 `SceneCapture2D`를 빛 방향으로 정렬 → `ShowOnly` caster의 깊이(`SceneDepth`)를 임시 RT에 캡처 → **RHI 복사로 공유 깊이 아틀라스의 해당 타일**에 기록 (`Round Robin`이면 프레임당 1개).
